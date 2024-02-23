@@ -1,0 +1,44 @@
+---
+name: Update Packages
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+
+jobs:
+  find-recipes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Find Updated Packages
+        id: set-matrix
+        run: |
+          echo "matrix=$(./update.py --check --repo ./aur.archlinux.org)" >> $GITHUB_OUTPUT
+
+  build:
+    needs: find-recipes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.find-recipes.outputs.matrix) }}
+    name: Update "${{ matrix.package }}"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Update
+        run: ./update.py ${{ matrix.package }} > COMMIT_MSG
+
+      - name: Commit and Push
+        run: |
+          cd ${{ matrix.package }}
+          git add PKGBUILD .SRCINFO
+          git commit -m $msg
+          git push

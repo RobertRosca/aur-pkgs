@@ -84,17 +84,10 @@ def main(path, check):
     pkgbuild = Pkgbuild.from_path(path)
 
     if not pkgbuild.check_update():
-        print(f"{pkgbuild.path} is already up to date")
-        exit(0)
-
-    print(
-        f"{pkgbuild.path} is out of date. "
-        f"Current version: {pkgbuild.current_version}, "
-        f"New version: {pkgbuild.new_version}"
-    )
+        return False
 
     if check:
-        return 0
+        return True
 
     pkgbuild.update_pkgbuild()
 
@@ -109,7 +102,13 @@ if __name__ == "__main__":
 
     paths = Path(args.path).glob("*/PKGBUILD") if args.repo else[Path(args.path)]
 
+    out = []
     for path in paths:
         if path.parent.name in args.skip:
             continue
-        main(path, check=args.check)
+        res = main(path, check=args.check)
+        if res:
+            out.append(str(path.parent))
+
+    if args.check:
+        print(json.dumps({"include": [{"package": p} for p in out]}))
