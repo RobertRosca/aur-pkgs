@@ -1,6 +1,11 @@
 [submodule "aur.archlinux.org/dura-git"]
 	path = aur.archlinux.org/dura-git
 	url = ssh://aur@aur.archlinux.org/dura-git.git
+	branch = master
+	ignore = all
+
 [submodule "aur.archlinux.org/uv-bin"]
 	path = aur.archlinux.org/uv-bin
 	url = ssh://aur@aur.archlinux.org/uv-bin.git
+	branch = master
+	ignore = all

@@ -3,7 +3,6 @@
 import argparse
 import json
 import re
-import subprocess
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
@@ -44,8 +43,7 @@ class Pkgbuild:
         self.path.write_text(out)
 
         print(
-            f"Updated {pkgbuild.path} from {pkgbuild.current_version} "
-            f"to {pkgbuild.new_version}"
+            f"Updated {self.path} from {self.current_version} " f"to {self.new_version}"
         )
 
     def update_srcinfo(self):
@@ -80,6 +78,7 @@ class Pkgbuild:
 
         return Pkgbuild(path, text, data, current_version, new_version)
 
+
 def main(path, check):
     pkgbuild = Pkgbuild.from_path(path)
 
@@ -91,16 +90,23 @@ def main(path, check):
 
     pkgbuild.update_pkgbuild()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Update PKGBUILD")
     parser.add_argument("path", type=Path, help="Path to package directory")
     parser.add_argument("--check", action="store_true", help="Check for updates")
-    parser.add_argument("--repo", action="store_true", help="Directory is repository of packages, not a single package")
-    parser.add_argument("--skip", nargs="+", help="Names of packages to skip", default=["dura-git"])
+    parser.add_argument(
+        "--repo",
+        action="store_true",
+        help="Directory is repository of packages, not a single package",
+    )
+    parser.add_argument(
+        "--skip", nargs="+", help="Names of packages to skip", default=["dura-git"]
+    )
 
     args = parser.parse_args()
 
-    paths = Path(args.path).glob("*/PKGBUILD") if args.repo else[Path(args.path)]
+    paths = Path(args.path).glob("*/PKGBUILD") if args.repo else [Path(args.path)]
 
     out = []
     for path in paths:
