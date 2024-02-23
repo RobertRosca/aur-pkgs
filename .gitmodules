@@ -1,9 +1,6 @@
 [submodule "aur.archlinux.org/dura-git"]
 	path = aur.archlinux.org/dura-git
 	url = ssh://aur@aur.archlinux.org/dura-git.git
-[submodule "aur.archlinux.org/ruff-bin"]
-	path = aur.archlinux.org/ruff-bin
-	url = ssh://aur@aur.archlinux.org/ruff-bin.git
 [submodule "aur.archlinux.org/uv-bin"]
 	path = aur.archlinux.org/uv-bin
 	url = ssh://aur@aur.archlinux.org/uv-bin.git
