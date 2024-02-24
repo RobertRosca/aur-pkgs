@@ -26,11 +26,12 @@ jobs:
         id: set-matrix
         run: |
           echo "matrix=$(./update.py --check --repo ./aur.archlinux.org)" >> $GITHUB_OUTPUT
+          cat $GITHUB_OUTPUT
 
   build:
     needs: find-recipes
     runs-on: ubuntu-latest
-    if: "${{ matrix.package }}"
+    if: '${{ needs.find-recipes.outputs.matrix != ''{"include": []}'' }}'
     strategy:
       matrix: ${{ fromJson(needs.find-recipes.outputs.matrix) }}
     name: Update "${{ matrix.package }}"
