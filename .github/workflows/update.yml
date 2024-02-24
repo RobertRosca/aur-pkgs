@@ -3,9 +3,8 @@ name: Update Packages
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
-
 
 jobs:
   find-recipes:
@@ -14,10 +13,14 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - uses: webfactory/ssh-agent@v0.9.0
         with:
-          submodules: 'true'
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Submodules
+        run: git submodule update --recursive --remote
 
       - name: Find Updated Packages
         id: set-matrix
