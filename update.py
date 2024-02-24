@@ -1,8 +1,8 @@
 #!/bin/env python3
-
 import argparse
 import json
 import re
+import subprocess
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
@@ -35,20 +35,25 @@ class Pkgbuild:
                     shas[arch] = response.readlines()[0].split()[0].decode("utf-8")
                     break
 
-        out = re.sub(r"(_pkgver=)(.*)", rf"\g<1>{self.new_version}", self.text)
+        out = self.text
+        out = re.sub(r"(_pkgver=)(.*)", rf"\g<1>{self.new_version}", out)
+        out = re.sub(r"(pkgrel=)(\d*)", r"\g<1>1", out)
 
         for arch, sha in shas.items():
             out = re.sub(rf"(sha256sums_{arch}=)\('(.*)'\)", rf"\g<1>('{sha}')", out)
 
         self.path.write_text(out)
 
-        print(
-            f"Updated {self.path} from {self.current_version} " f"to {self.new_version}"
-        )
+        print(f"Updated {self.path} from {self.current_version} to {self.new_version}")
+
+        self.update_srcinfo()
 
     def update_srcinfo(self):
         srcinfo = self.path.parent / ".SRCINFO"
-        srcinfo.write_text(srcinfo.decode("utf-8"))
+        res = subprocess.check_output(
+            ["makepkg", "--printsrcinfo"], cwd=self.path.parent
+        )
+        srcinfo.write_text(res.decode("utf-8"))
 
         print("Updated .SRCINFO")
 
@@ -106,7 +111,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    paths = Path(args.path).glob("*/PKGBUILD") if args.repo else [Path(args.path)]
+    paths = (
+        Path(args.path).glob("*/PKGBUILD")
+        if args.repo
+        else [Path(args.path) / "PKGBUILD"]
+    )
 
     out = []
     for path in paths:

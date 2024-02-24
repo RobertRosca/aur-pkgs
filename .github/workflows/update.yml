@@ -20,7 +20,10 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Checkout Submodules
-        run: git submodule update --recursive --remote
+        run: |
+          git submodule update --init --recursive --remote
+          ls -la
+          ls -la ./aur.archlinux.org/*
 
       - name: Find Updated Packages
         id: set-matrix
@@ -42,6 +45,11 @@ jobs:
 
       - name: Update
         run: ./update.py ${{ matrix.package }} > COMMIT_MSG
+
+      - name: Check
+        run: |
+          docker build . -t aur-check
+          docker run --rm -it -v ${{ matrix.package }}:/src aur-check
 
       - name: Commit and Push
         run: |
