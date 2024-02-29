@@ -21,9 +21,9 @@ jobs:
 
       - name: Checkout Submodules
         run: |
+          mkdir -p ~/.ssh
+          cat .github/known-hosts >> ~/.ssh/known_hosts
           git submodule update --init --recursive --remote
-          ls -la
-          ls -la ./aur.archlinux.org/*
 
       - name: Find Updated Packages
         id: set-matrix
@@ -42,6 +42,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout Submodules
+        run: |
+          mkdir -p ~/.ssh
+          cat .github/known-hosts >> ~/.ssh/known_hosts
+          git submodule update --init --recursive --remote
 
       - name: Update
         run: ./update.py ${{ matrix.package }} > COMMIT_MSG
