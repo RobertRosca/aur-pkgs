@@ -28,7 +28,7 @@ jobs:
       - name: Find Updated Packages
         id: set-matrix
         run: |
-          echo "matrix=$(./update.py --check --repo ./aur.archlinux.org)" >> $GITHUB_OUTPUT
+          echo "matrix=$(./scripts/update.py --check --repo ./aur.archlinux.org)" >> $GITHUB_OUTPUT
           cat $GITHUB_OUTPUT
 
   build:
