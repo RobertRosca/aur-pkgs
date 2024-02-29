@@ -48,8 +48,9 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Build Docker image
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5.1.0
         with:
+          context: .
           push: false
           tags: aur-pkg
 
@@ -62,18 +63,19 @@ jobs:
       - name: Update
         run: |
           docker run --rm \
-            -v ${{ matrix.package }}:/src \
+            -v ./${{ matrix.package }}:/src \
             -v ./scripts:/scripts \
             aur-pkg \
-            /scripts/update.py /src > COMMIT_MSG
+            /scripts/in-docker /scripts/update.py /src > COMMIT_MSG
 
       - name: Check
         run: |
           docker run --rm \
-            -v ${{ matrix.package }}:/src \
+            -v ./${{ matrix.package }}:/src \
             -v ./scripts:/scripts \
+            -w /src \
             aur-pkg \
-            makepkg -sc
+            /scripts/in-docker makepkg -sc
 
       - name: Commit and Push
         run: |
