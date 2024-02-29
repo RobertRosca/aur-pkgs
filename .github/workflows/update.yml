@@ -47,6 +47,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Build Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          push: false
+          tags: aur-pkg
+
       - name: Checkout Submodules
         run: |
           mkdir -p ~/.ssh
@@ -54,12 +60,20 @@ jobs:
           git submodule update --init --recursive --remote
 
       - name: Update
-        run: ./update.py ${{ matrix.package }} > COMMIT_MSG
+        run: |
+          docker run --rm \
+            -v ${{ matrix.package }}:/src \
+            -v ./scripts:/scripts \
+            aur-pkg \
+            /scripts/update.py /src > COMMIT_MSG
 
       - name: Check
         run: |
-          docker build . -t aur-check
-          docker run --rm -it -v ${{ matrix.package }}:/src aur-check
+          docker run --rm \
+            -v ${{ matrix.package }}:/src \
+            -v ./scripts:/scripts \
+            aur-pkg \
+            makepkg -sc
 
       - name: Commit and Push
         run: |
