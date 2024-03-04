@@ -66,7 +66,7 @@ jobs:
             -v ./${{ matrix.package }}:/src \
             -v ./scripts:/scripts \
             aur-pkg \
-            /scripts/in-docker.sh /scripts/update.py /src > COMMIT_MSG
+            /scripts/update.py /src > COMMIT_MSG
 
       - name: Check
         run: |
@@ -75,7 +75,7 @@ jobs:
             -v ./scripts:/scripts \
             -w /src \
             aur-pkg \
-            /scripts/in-docker.sh makepkg -sc
+            makepkg -sc
 
       - name: Commit and Push
         run: |
