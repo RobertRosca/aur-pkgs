@@ -61,16 +61,20 @@ jobs:
           cat .github/known_hosts >> ~/.ssh/known_hosts
           git config --global --add safe.directory $PWD
           git submodule update --init --recursive --remote ${{ matrix.package }}
+          chown -R builder:builder ${{ matrix.package }}
 
       - name: Update
-        run: runuser -u builder -- ./scripts/update.py ${{ matrix.package }} > COMMIT_MSG
+        run: |
+          runuser -u builder -- ./scripts/update.py ${{ matrix.package }} > ${{ matrix.package }}/COMMIT_MSG
 
       - name: Check
-        run: cd ${{ matrix.package }} && runuser -u builder -- makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
+        run: |
+          cd ${{ matrix.package }}
+          runuser -u builder -- makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
 
       - name: Commit and Push
         run: |
           cd ${{ matrix.package }}
           git add PKGBUILD .SRCINFO
-          git commit -m $msg
+          git commit -m $(cat COMMIT_MSG)
           git push
