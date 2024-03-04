@@ -3,7 +3,7 @@ FROM archlinux:latest
 WORKDIR /src
 
 RUN pacman -Syu --noconfirm && \
-    pacman -S --needed --noconfirm binutils fakeroot python sudo && \
+    pacman -S --needed --noconfirm binutils fakeroot python openssh sudo && \
     pacman -Scc --noconfirm
 
 RUN useradd -m builder && \
