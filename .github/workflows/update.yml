@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/robertrosca/aur-pkgs:main
+      options: --user root
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
@@ -61,10 +62,10 @@ jobs:
           git submodule update --init --recursive --remote ${{ matrix.package }}
 
       - name: Update
-        run: ./scripts/update.py ${{ matrix.package }} > COMMIT_MSG
+        run: runuser -u builder -- ./scripts/update.py ${{ matrix.package }} > COMMIT_MSG
 
       - name: Check
-        run: cd ${{ matrix.package }} && makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
+        run: cd ${{ matrix.package }} && runuser -u builder -- makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
 
       - name: Commit and Push
         run: |
