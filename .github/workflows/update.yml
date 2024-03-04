@@ -76,6 +76,8 @@ jobs:
         run: |
           cd ${{ matrix.package }}
           git config --global --add safe.directory $PWD
+          git status -sb
+          git diff
           git add PKGBUILD .SRCINFO
           git commit -m $(cat COMMIT_MSG)
           git push
