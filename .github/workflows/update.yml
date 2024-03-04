@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Submodules
         run: |
           mkdir -p ~/.ssh
-          cat .github/known-hosts >> ~/.ssh/known_hosts
+          cat .github/known_hosts >> ~/.ssh/known_hosts
           git submodule update --init --recursive --remote
 
       - name: Find Updated Packages
@@ -58,7 +58,7 @@ jobs:
       - name: Checkout Submodules
         run: |
           mkdir -p ~/.ssh
-          cat .github/known-hosts >> ~/.ssh/known_hosts
+          cat .github/known_hosts >> ~/.ssh/known_hosts
           git config --global --add safe.directory $PWD
           git submodule update --init --recursive --remote ${{ matrix.package }}
 
