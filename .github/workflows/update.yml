@@ -79,5 +79,5 @@ jobs:
           git status -sb
           git diff
           git add PKGBUILD .SRCINFO
-          git commit -m $(cat COMMIT_MSG)
+          git commit -F COMMIT_MSG
           git push
