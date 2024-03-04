@@ -8,4 +8,4 @@ chown -R nobody:nobody /tmp/src
 
 cd /tmp/src || exit 1
 
-HOME=/tmp/nobody runuser -p -unobody "$@"
+HOME=/tmp/nobody runuser -p -unobody -- "$@"
