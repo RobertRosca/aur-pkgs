@@ -32,6 +32,8 @@ jobs:
           cat $GITHUB_OUTPUT
 
   build:
+    permissions:
+      packages: read
     needs: find-recipes
     runs-on: ubuntu-latest
     container:
