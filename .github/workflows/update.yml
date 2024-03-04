@@ -34,6 +34,8 @@ jobs:
   build:
     needs: find-recipes
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/robertrosca/aur-pkgs:main
     if: '${{ needs.find-recipes.outputs.matrix != ''{"include": []}'' }}'
     strategy:
       matrix: ${{ fromJson(needs.find-recipes.outputs.matrix) }}
@@ -47,36 +49,17 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v5.1.0
-        with:
-          context: .
-          push: false
-          tags: aur-pkg
-
       - name: Checkout Submodules
         run: |
           mkdir -p ~/.ssh
           cat .github/known-hosts >> ~/.ssh/known_hosts
-          git submodule update --init --recursive --remote
+          git submodule update --init --recursive --remote ${{ matrix.package }}
 
       - name: Update
-        run: |
-          docker run --rm \
-            -v ./${{ matrix.package }}:/src \
-            -v ./scripts:/scripts \
-            aur-pkg \
-            /scripts/update.py /src > COMMIT_MSG
+        run: ./scripts/update.py ${{ matrix.package }} > COMMIT_MSG
 
       - name: Check
-        run: |
-          docker run --rm \
-            -v ./${{ matrix.package }}:/src \
-            -v ./scripts:/scripts \
-            -w /src \
-            --ulimit nofile=1024:10240 \
-            aur-pkg \
-            makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
+        run: cd ${{ matrix.package }} && makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
 
       - name: Commit and Push
         run: |
