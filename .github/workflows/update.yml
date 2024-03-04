@@ -36,6 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/robertrosca/aur-pkgs:main
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
     if: '${{ needs.find-recipes.outputs.matrix != ''{"include": []}'' }}'
     strategy:
       matrix: ${{ fromJson(needs.find-recipes.outputs.matrix) }}
