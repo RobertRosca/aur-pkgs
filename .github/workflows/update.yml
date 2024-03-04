@@ -74,8 +74,9 @@ jobs:
             -v ./${{ matrix.package }}:/src \
             -v ./scripts:/scripts \
             -w /src \
+            --ulimit nofile=1024:10240 \
             aur-pkg \
-            makepkg -sc
+            makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
 
       - name: Commit and Push
         run: |
