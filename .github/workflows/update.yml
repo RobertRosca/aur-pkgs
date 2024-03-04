@@ -70,7 +70,7 @@ jobs:
       - name: Check
         run: |
           cd ${{ matrix.package }}
-          runuser -u builder -- PKGEXT='.pkg.tar' makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
+          PKGEXT='.pkg.tar' runuser -u builder -- makepkg -s --check --noprogressbar --noconfirm --nocolor --clean
 
       - name: Commit and Push
         run: |
